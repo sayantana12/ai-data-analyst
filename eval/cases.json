@@ -1,0 +1,7 @@
+[
+  {"name": "regional ranking", "question": "Which region generated the highest revenue?", "expected_tools": ["run_pandas_analysis", "execute_sql"]},
+  {"name": "monthly trend", "question": "Show monthly sales trends.", "expected_tools": ["create_chart"]},
+  {"name": "anomalies", "question": "Detect anomalies in the dataset.", "expected_tools": ["detect_anomalies"]},
+  {"name": "quality", "question": "Check data quality.", "expected_tools": ["data_quality_check"]},
+  {"name": "forecast", "question": "Forecast sales for the next 3 periods.", "expected_tools": ["forecast"]}
+]

@@ -1,0 +1,13 @@
+date,region,product,customer,sales,quantity
+2026-01-03,East,Laptop,Acme Ltd,1200,2
+2026-01-08,West,Monitor,Blue Retail,700,5
+2026-02-02,East,Keyboard,Acme Ltd,320,8
+2026-02-10,North,Laptop,Delta Co,1500,2
+2026-03-04,West,Mouse,Blue Retail,180,10
+2026-03-18,South,Laptop,Green Stores,950,1
+2026-04-05,East,Monitor,Acme Ltd,900,6
+2026-04-19,North,Keyboard,Delta Co,400,10
+2026-05-02,South,Mouse,Green Stores,210,12
+2026-05-16,West,Laptop,Blue Retail,1750,2
+2026-06-01,East,Laptop,Acme Ltd,1300,2
+2026-06-20,North,Monitor,Delta Co,800,5
