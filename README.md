@@ -69,7 +69,9 @@ Architecture
                ▼
           CSV Dataset
 
+
 Detailed architecture diagram:
+
 docs/architecture.svg
 Project Structure
 ai_data_analyst/
