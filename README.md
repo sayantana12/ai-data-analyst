@@ -1,210 +1,720 @@
-# AI-Powered Data Analyst
+AI-Powered Data Analyst
+An AI-powered data analysis application that allows users to upload CSV datasets and interact with their data using natural language.
+The system combines an LLM-based reasoning layer with deterministic analytical tools to transform natural-language questions into useful data analysis, visualizations, anomaly detection results, and reproducible SQL/Pandas code.
+Table of Contents
+- Project Overview
+- Problem Statement
+- Objectives
+- Key Features
+- Project Flow
+- System Architecture
+- Folder Architecture
+- Module Responsibilities
+- Technology Stack
+- Data Analysis Workflow
+- LLM and Fallback Workflow
+- Visualization Workflow
+- Anomaly Detection Workflow
+- SQL and Pandas Code Generation
+- Conversation Context
+- Setup and Installation
+- Environment Variables
+- Running the Application
+- Docker Support
+- Sample Dataset
+- Example Questions
+- Current Implementation Status
+- Remaining Work
+- Engineering Considerations
+- Deliverables
+- Future Improvements
+Project Overview
+The AI-Powered Data Analyst is designed to make data analysis accessible through natural-language interaction.
+Instead of requiring the user to manually write SQL queries, Pandas operations, or visualization code, the user can upload a CSV dataset and ask questions such as:
+Which region generated the highest revenue?
 
-A production-oriented Streamlit AI data analyst built for the Digital Back Office AI Engineer assignment.
+or:
+Show the monthly sales trend.
 
-The assignment requires an AI-powered analyst that accepts one or more CSV files, answers natural-language questions, generates insights and visualizations, detects anomalies, explains reasoning with an LLM, and maintains conversation context. The assignment also lists bonus capabilities including multi-file analysis, dashboard generation, data quality checks, forecasting, agentic workflows, tool calling and semantic search.
+The system interprets the request, selects the appropriate analytical operation, executes it against the uploaded dataset, and returns the result.
+Depending on the request, the system can also generate:
+- Business insights
+- Charts
+- SQL
+- Pandas code
+- Anomaly detection results
+- Data-quality information
+- Forecasting results
+- Dashboard information
+Problem Statement
+Traditional data analysis requires knowledge of programming languages, SQL, statistical methods, and visualization libraries.
+The objective of this project is to create an AI-assisted interface that allows users to interact with structured CSV data using natural language while keeping the actual analysis grounded in the uploaded dataset.
+The application therefore combines:
+Natural Language
+       ↓
+AI / Agent Reasoning
+       ↓
+Analytical Tool Selection
+       ↓
+Actual Dataset
+       ↓
+Computation
+       ↓
+Result / Chart / Code / Insight
 
-## What makes this an AI application rather than an LLM API wrapper?
+Objectives
+The project aims to provide:
+- CSV upload and validation
+- Natural-language data analysis
+- Business insights and summaries
+- Automatic visualization
+- SQL generation
+- Pandas code generation
+- Anomaly detection
+- Explanation of analytical results
+- Conversational context
+- Data-quality analysis
+- Multi-file analysis capability
+- Dashboard generation
+- Forecasting support
+- Semantic search support
+- Modular and extensible architecture
+- Local fallback for supported analytical operations
+Key Features
+1. CSV Upload and Validation
+Users can upload CSV datasets through the Streamlit interface.
+The system profiles the uploaded data and provides information such as:
+- Number of rows
+- Number of columns
+- Column names
+- Data types
+- Missing values
+- Duplicate records
+- Dataset preview
+2. Natural-Language Q&A
+Users can ask questions about the uploaded dataset without manually writing code.
+Example:
+Which region generated the highest revenue?
 
-Gemini is not used as a calculator or as a generic text generator. It is the **analyst/orchestrator**.
+The system interprets the question and performs the corresponding analysis.
+3. Business Insights
+The system can transform analytical results into understandable business-oriented responses.
+Examples include:
+- Highest-performing regions
+- Top products
+- Sales trends
+- Customer performance
+- Underperforming categories
+- Summary statistics
+4. Data Visualization
+The application supports analytical visualizations based on the uploaded data.
+Depending on the request and implementation, charts can include:
+- Bar charts
+- Line charts
+- Pie charts
+- Scatter plots
+The visualization is generated from the actual dataset.
+5. SQL Generation
+The system can generate SQL for appropriate analytical questions.
+Generated SQL is intended for read-only analytical operations.
+Example:
+Generate SQL for this analysis.
 
-The agent receives the user's question, the dataset schema and conversation context. Gemini is given explicit function declarations for local analytics tools. It decides which tool to call, receives the computed result, evaluates that evidence, and can call another tool when the question requires multiple analytical steps. Only after the evidence is sufficient does it produce the final natural-language response and reasoning summary.
+6. Pandas Code Generation
+The system can generate Pandas code corresponding to supported analytical operations.
+This provides users with reproducible code for the analysis.
+Example:
+Generate Pandas code for this analysis.
 
-Flow:
+7. Anomaly Detection
+The application includes anomaly-detection functionality for numerical data.
+The system identifies records that deviate significantly from the expected distribution and returns the flagged records together with the detection method/rule.
+8. Data Quality
+The application provides data-quality information including:
+- Missing cells
+- Duplicate rows
+- Column information
+- Dataset dimensions
+9. Forecasting
+The analytical layer contains forecasting functionality for time-based numerical data.
+The current forecasting implementation is intended as a baseline and can be extended with more advanced forecasting approaches.
+10. Semantic Search
+A semantic-search component is included to retrieve relevant records based on natural-language queries.
+11. Dashboard Generation
+The analytical tool layer contains dashboard-generation functionality capable of producing KPI information and analytical widgets.
+The dashboard functionality can be extended further for fully automated multi-widget dashboards.
+Project Flow
+The complete application flow can be represented as follows:
+                    USER
+                      │
+                      ▼
+            ┌──────────────────┐
+            │  Streamlit UI    │
+            └────────┬─────────┘
+                     │
+                     ▼
+            ┌──────────────────┐
+            │ Upload CSV File  │
+            └────────┬─────────┘
+                     │
+                     ▼
+            ┌──────────────────┐
+            │ Data Validation  │
+            │ & Profiling      │
+            └────────┬─────────┘
+                     │
+                     ▼
+            ┌──────────────────┐
+            │ Dataset Context  │
+            └────────┬─────────┘
+                     │
+                     ▼
+          ┌───────────────────────┐
+          │ Natural Language      │
+          │ User Question         │
+          └───────────┬───────────┘
+                      │
+                      ▼
+              ┌───────────────┐
+              │ Agent / LLM   │
+              │ Reasoning     │
+              └───────┬───────┘
+                      │
+                      ▼
+             ┌─────────────────┐
+             │ Select Tool /   │
+             │ Analysis        │
+             └───────┬─────────┘
+                     │
+       ┌─────────────┼─────────────┐
+       │             │             │
+       ▼             ▼             ▼
+   Pandas/SQL     Chart       Anomaly
+   Analysis       Creation   Detection
+       │             │             │
+       └─────────────┼─────────────┘
+                     │
+                     ▼
+             ┌─────────────────┐
+             │ Actual Dataset  │
+             │ Computation     │
+             └───────┬─────────┘
+                     │
+                     ▼
+             ┌─────────────────┐
+             │ Result / Chart  │
+             │ / Code / Insight│
+             └───────┬─────────┘
+                     │
+                     ▼
+                   USER
 
-```text
-User question
-    ↓
-LLM Analyst Agent
-    ├── understand intent
-    ├── inspect schema/context
-    ├── choose analytical tool(s)
-    └── decide whether more evidence is needed
-    ↓
-Local tool execution
-    ├── DuckDB SQL
-    ├── safe Pandas operations
-    ├── Plotly chart preparation
-    ├── anomaly detection
-    ├── forecasting
-    ├── semantic search
-    ├── data quality
-    └── dashboard generation
-    ↓
-Tool result returned to LLM
-    ↓
-LLM evaluates evidence
-    ↓
-Optional additional tool call(s)
-    ↓
-Final answer + evidence-based reasoning summary
-```
+System Architecture
+The application follows a modular architecture.
+                         ┌──────────────┐
+                         │     User     │
+                         └──────┬───────┘
+                                │
+                                ▼
+                     ┌────────────────────┐
+                     │    Streamlit UI    │
+                     │      app.py        │
+                     └─────────┬──────────┘
+                               │
+                               ▼
+                     ┌────────────────────┐
+                     │    Agent Layer     │
+                     │     agent.py       │
+                     └─────────┬──────────┘
+                               │
+                  ┌────────────┴────────────┐
+                  │                         │
+                  ▼                         ▼
+          ┌───────────────┐       ┌────────────────┐
+          │    LLM Layer  │       │ Local Fallback │
+          │    llm.py     │       │   Analytics    │
+          └───────┬───────┘       └───────┬────────┘
+                  │                       │
+                  └───────────┬───────────┘
+                              │
+                              ▼
+                    ┌───────────────────┐
+                    │    Tools Layer    │
+                    │     tools.py      │
+                    └─────────┬─────────┘
+                              │
+            ┌─────────────────┼─────────────────┐
+            │                 │                 │
+            ▼                 ▼                 ▼
+       ┌─────────┐       ┌─────────┐      ┌──────────┐
+       │ Pandas  │       │   SQL   │      │ Charts   │
+       └─────────┘       └─────────┘      └──────────┘
+            │                 │                 │
+            └─────────────────┼─────────────────┘
+                              │
+                              ▼
+                    ┌───────────────────┐
+                    │ Uploaded Dataset  │
+                    │       CSV         │
+                    └───────────────────┘
 
-This is a genuine function-calling / agent loop. The application executes functions; Gemini only chooses and requests them. This follows the documented Gemini function-calling pattern: declare tools, let the model request a function, execute it in the application, send the function result back, and repeat as needed. See Google's official documentation: https://ai.google.dev/gemini-api/docs/function-calling
+A visual version of the architecture is also provided in:
+docs/architecture.svg
 
-## Core requirement coverage
+Folder Architecture
+ai_data_analyst/
+│
+├── app.py
+│
+├── app/
+│   └── core/
+│       ├── __init__.py
+│       ├── agent.py
+│       ├── analytics.py
+│       ├── data_manager.py
+│       ├── llm.py
+│       ├── report.py
+│       ├── search.py
+│       └── tools.py
+│
+├── data/
+│   └── sample CSV dataset(s)
+│
+├── docs/
+│   └── architecture.svg
+│
+├── tests/
+│
+├── eval/
+│
+├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
+├── .env.example
+├── .gitignore
+└── README.md
 
-| Assignment requirement | Implementation |
-|---|---|
-| Upload and validate one or more CSV files | `data_manager.py` validates size, parseability, empty files and duplicate columns; multiple files are combined with a `_source_file` column. |
-| Answer questions in natural language | Gemini Analyst Agent interprets the question and produces the final answer from tool evidence. |
-| Generate business insights and summaries | LLM selects aggregation/search/SQL tools and explains computed findings. |
-| Create charts | LLM calls `create_chart`; Plotly renders Bar, Line, Pie, Scatter and Histogram charts. |
-| Generate SQL and/or Pandas code | LLM can call `execute_sql` or `generate_pandas_code`; generated Python is displayed, never executed. |
-| Detect anomalies and explain why | LLM calls `detect_anomalies`; tool returns the exact IQR/z-score rule and flagged rows; LLM explains the evidence. |
-| Explain reasoning | Final LLM response is instructed to provide a concise, auditable reasoning summary tied to tool results. |
-| Maintain conversation context | Recent session messages are supplied to the LLM on every analytical turn. |
+Module Responsibilities
+app.py
+Main Streamlit application.
+Responsible for:
+- User interface
+- CSV upload
+- Dataset display
+- Chat interface
+- Session/conversation state
+- Displaying analytical results
+- Rendering generated charts
+app/core/agent.py
+Agent orchestration layer.
+Responsible for:
+- Processing user requests
+- Maintaining the analytical interaction flow
+- Communicating with the LLM layer
+- Selecting and executing analytical tools
+- Handling tool results
+- Returning the final response
+- Handling fallback behaviour
+app/core/llm.py
+LLM integration layer.
+Responsible for:
+- LLM configuration
+- System instructions
+- Tool definitions
+- Natural-language reasoning
+- Structured analytical requests
+- Communication with the configured LLM provider
+app/core/analytics.py
+Core analytical engine.
+Contains functionality used for:
+- SQL execution
+- Anomaly detection
+- Chart creation
+- Forecasting
+- Pandas code templates
+- Safe column/identifier handling
+- Analytical calculations
+app/core/data_manager.py
+Dataset-management layer.
+Responsible for:
+- Dataset profiling
+- Data-quality analysis
+- Dataset metadata
+- Data validation-related functionality
+app/core/tools.py
+Tool execution layer.
+Provides reusable analytical tools such as:
+inspect_schema
+generate_sql
+execute_sql
+run_pandas_analysis
+create_chart
+detect_anomalies
+forecast
+semantic_search
+data_quality_check
+create_dashboard
+generate_pandas_code
 
-## Bonus coverage
+The agent can use these tools to perform operations against the uploaded dataset.
+app/core/search.py
+Contains semantic-search functionality for retrieving relevant records from the dataset using a query.
+app/core/report.py
+Contains reporting-related functionality used by the application.
+tests/
+Contains project tests and is intended for validating individual components and analytical workflows.
+eval/
+Contains evaluation-related project resources and provides a foundation for evaluating analytical behaviour.
+data/
+Stores sample CSV dataset(s) used for testing and demonstration.
+docs/
+Contains project documentation assets.
+Currently includes:
+architecture.svg
 
-### 1. Multi-file analysis
+Data Analysis Workflow
+When a CSV is uploaded:
+Step 1 — Upload
+The user selects a CSV file through the Streamlit interface.
+Step 2 — Load
+The application loads the dataset into the data-processing layer.
+Step 3 — Validate
+Basic data-quality information is calculated.
+Step 4 — Profile
+The system identifies:
+- Rows
+- Columns
+- Data types
+- Missing values
+- Duplicate records
+Step 5 — Context
+The dataset schema and relevant metadata become available to the analysis workflow.
+Step 6 — User Question
+The user asks a natural-language question.
+Step 7 — Intent / Tool Selection
+The agent determines what type of analysis is required.
+Step 8 — Analytical Execution
+The appropriate analytical tool operates on the actual dataset.
+Step 9 — Result Processing
+The result is converted into a user-readable response.
+Step 10 — Visualization / Code
+If requested or appropriate, the system can additionally produce:
+- Charts
+- SQL
+- Pandas code
+- Anomaly results
+- Other analytical outputs
+LLM and Fallback Workflow
+The application is designed so that the LLM is not the only component capable of performing data analysis.
+The conceptual workflow is:
+User Question
+      │
+      ▼
+LLM / Agent Reasoning
+      │
+      ▼
+Analytical Tool
+      │
+      ▼
+Actual CSV Data
+      │
+      ▼
+Result
 
-Multiple CSV uploads are validated and combined. Each row receives `_source_file`, preserving file provenance. The combined schema is passed to the analyst agent.
+When external LLM processing is unavailable or fails for supported operations, the application can fall back to deterministic local analytical processing.
+This improves reliability and reduces complete dependence on an external API.
+Visualization Workflow
+For a visualization request:
+Natural-Language Question
+          │
+          ▼
+      Agent / LLM
+          │
+          ▼
+    Chart Parameters
+          │
+          ▼
+     Chart Tool
+          │
+          ▼
+     Actual Dataset
+          │
+          ▼
+   Aggregation / Processing
+          │
+          ▼
+      Plotly Chart
+          │
+          ▼
+      Streamlit UI
 
-### 2. Dashboard generation
+The chart is generated using data from the uploaded dataset.
+Anomaly Detection Workflow
+User Request
+     │
+     ▼
+Anomaly Detection Tool
+     │
+     ▼
+Select Numerical Column
+     │
+     ▼
+Statistical Detection
+     │
+     ▼
+Flagged Records
+     │
+     ▼
+Explanation / Result
 
-`create_dashboard` is an LLM-callable tool. It computes KPIs and creates dashboard widget specifications for category and monthly trends. The Streamlit Dashboard tab renders the returned specification.
+The system can identify anomalous records and return information about the method/rule used.
+SQL and Pandas Code Generation
+The project supports reproducible analysis through generated code.
+User Question
+      │
+      ▼
+Analytical Interpretation
+      │
+      ├───────────────┐
+      ▼               ▼
+ Generate SQL     Generate Pandas
+      │               │
+      ▼               ▼
+ Read-only SQL    Reproducible Python
 
-### 3. Data quality checks
+This allows users to understand how an analysis can be reproduced outside the application.
+Conversation Context
+The application maintains conversational state during interaction.
+For example:
+User:
+Which region generated the highest revenue?
 
-The quality tool reports row/column counts, missing cells, duplicate rows, data types, missing percentages and unique counts.
+Assistant:
+Region X generated the highest revenue.
 
-### 4. Forecasting
+User:
+What was its revenue?
 
-The `forecast` tool uses a transparent CPU-only linear trend over a date/time index. It requires at least three valid observations and returns future dates plus forecasts. It is explicitly presented as a simple trend forecast, not as a deep-learning model.
+Assistant:
+...
 
-### 5. Agentic workflow
+The second question can be interpreted in the context of the previous interaction.
+Technology Stack
+Component	Technology
+Programming Language	Python
+User Interface	Streamlit
+Data Processing	Pandas
+SQL Analytics	DuckDB
+Visualization	Plotly
+LLM Integration	Configured LLM API
+Containerization	Docker
+Version Control	Git / GitHub
 
-The agent runs a bounded multi-step loop (up to eight model/tool turns). Example:
 
-```text
-Question
-  ↓
-Tool call: aggregate revenue by region
-  ↓
-LLM receives result
-  ↓
-Tool call: filter winning region
-  ↓
-Tool call: rank products
-  ↓
-LLM evaluates evidence
-  ↓
-Final answer
-```
+Setup and Installation
+Prerequisites
+Install:
+- Python 3.x
+- Git
+- Docker (optional)
+Clone Repository
+git clone https://github.com/sayantana12/ai-data-analyst.git
+cd ai-data-analyst
 
-### 6. Tool calling
-
-Gemini receives real function declarations for the application's tools. Tool calls are parsed and executed by Python. Their results are returned to Gemini as function responses. No arbitrary Python is executed from the model.
-
-### 7. Semantic search
-
-`semantic_search` uses local TF-IDF vectorization and cosine similarity over row text. No second paid embedding service is required.
-
-## Additional engineering features
-
-The PDF also mentions other optional capabilities. The project includes or provides the following lightweight implementations where practical:
-
-- Caching: Streamlit session state keeps conversation and last analysis results during the session.
-- Authentication: optional password protection via `APP_PASSWORD`.
-- Export reports: HTML report and agent trace JSON download.
-- Streaming helper: the architecture is compatible with Gemini streaming; the final six-hour build prioritizes reliable function calling and evidence evaluation over a second streaming path.
-- Observability/logging: every tool call is captured in the visible agent execution trace and exportable JSON.
-- Evaluation framework: automated pytest tests cover core local analytical tools; the tool trace can be used for manual agent evaluation cases.
-
-## Safety / production-minded decisions
-
-- CSV input is validated before analysis.
-- SQL execution is restricted to read-only `SELECT` / `WITH` statements.
-- Mutating/external SQL keywords are rejected.
-- Generated Pandas code is displayed but never executed.
-- Tool arguments are validated against real dataframe columns.
-- Tool errors are returned to the LLM so it can recover or explain missing information.
-- The agent has a maximum number of tool-call steps to prevent infinite loops.
-- The LLM is explicitly instructed not to invent data values or columns.
-- The final answer is grounded in locally computed evidence.
-- If the Gemini API is unavailable, a deterministic local fallback is used for common demo operations rather than fabricating an answer.
-
-## Sample questions
-
-- Which region generated the highest revenue?
-- Show monthly sales trends.
-- Which products are underperforming?
-- What are the top five customers?
-- Generate SQL for this analysis.
-- Detect anomalies in the dataset.
-
-## Setup
-
-### 1. Create environment
-
-Windows:
-
-```powershell
+Create Virtual Environment
+Windows
 python -m venv .venv
-.venv\\Scripts\\activate
-```
 
-Linux/macOS:
+Activate:
+.venv\Scripts\activate
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-```
-
-### 2. Install
-
-```bash
+Install Dependencies
 pip install -r requirements.txt
-```
 
-### 3. Configure Gemini
+Environment Variables
+Create a .env file in the project root.
+Use .env.example as a template.
+Example:
+OPENROUTER_API_KEY=your_api_key_here
+OPENROUTER_MODEL=openrouter/free
+APP_URL=http://localhost:8501
+APP_NAME=AI Data Analyst
 
-Copy `.env.example` to `.env`:
-
-```env
-GEMINI_API_KEY=YOUR_FREE_GEMINI_API_KEY
-GEMINI_MODEL=gemini-2.5-flash
-APP_PASSWORD=
-```
-
-Do not commit `.env`.
-
-### 4. Run
-
-```bash
+Never commit your actual .env file or API key.
+Running the Application
+After activating the virtual environment:
 streamlit run app.py
-```
 
-## Docker
+The application will start on the local Streamlit server.
+Docker Support
+Docker configuration is provided through:
+Dockerfile
+docker-compose.yml
 
-```bash
+Run:
 docker compose up --build
-```
 
-## Tests
+Docker support provides a reproducible environment for running the application.
+Sample Dataset
+Sample CSV dataset(s) are provided in:
+data/
 
-```bash
-pytest -q
-```
+These datasets can be uploaded through the Streamlit application for testing.
+The application is not limited to a fixed dataset and is designed to work with uploaded CSV data according to the supported analytical operations.
+Example Questions
+After uploading a suitable dataset, users can ask:
+Which region generated the highest revenue?
 
-## Architecture diagram
+Show monthly sales trends.
 
-See `docs/architecture.svg`.
+Which products are underperforming?
 
-## Sample data
+What are the top five customers?
 
-`data/sample_sales.csv` is included for the required demo questions.
+Detect anomalies in the dataset.
 
-## Submission evidence
+Generate SQL for this analysis.
 
-The assignment requests screenshots and a 10–30 second demo video or live link. Those should be captured from the actually running application rather than fabricated. Add the resulting screenshots/video link to this README before submission.
+Generate Pandas code for this analysis.
 
-## Implementation notes
+Current Implementation Status
+Implemented
+The current project includes the core data-analysis workflow:
+- CSV upload
+- CSV validation
+- Dataset profiling
+- Data-quality checks
+- Natural-language questions
+- Analytical processing
+- Business-oriented responses
+- Visualization functionality
+- SQL generation
+- Pandas code generation
+- Anomaly detection
+- Conversational context
+- Forecasting support
+- Semantic-search support
+- Dashboard-generation support
+- Modular analytical tools
+- LLM integration
+- Local analytical fallback
+- Docker configuration
+- Sample dataset support
+- Architecture documentation
+Remaining / Under Refinement
+The following capabilities from the complete assignment specification still require additional implementation, refinement, integration, or testing:
+- More robust multi-file reasoning
+- Automated dataset joining across multiple files
+- More comprehensive automatic dashboard generation
+- Forecasting improvements
+- Semantic-search improvements
+- Caching
+- Authentication
+- Report export
+- Streaming responses
+- Observability and logging
+- Dedicated evaluation framework
+- Further refinement of automatic analytical routing
+- Further refinement of automatic visualization selection
+These are designed as extensions to the current modular architecture.
+Engineering Considerations
+The application separates responsibilities across different modules rather than placing the entire workflow inside a single script.
+The major layers are:
+Presentation Layer
+       ↓
+Agent Layer
+       ↓
+LLM / Reasoning Layer
+       ↓
+Tool Layer
+       ↓
+Analytics Layer
+       ↓
+Dataset
 
-1. Streamlit was selected for the six-hour implementation because it provides upload, chat, dashboard and export capabilities with a small frontend footprint.
-2. Gemini is used as the reasoning/orchestration layer and function-calling interface.
-3. DuckDB/Pandas/Plotly/scikit-learn perform deterministic local computation on CPU.
-4. No GPU is required.
-5. Forecasting is intentionally lightweight and transparent.
-6. The project avoids arbitrary code execution from LLM output.
+This modular structure makes it possible to extend individual capabilities independently.
+Examples:
+- Add a new analytical tool without rewriting the UI.
+- Replace or extend the LLM integration without rewriting the analytics engine.
+- Add new visualization capabilities through the chart layer.
+- Improve anomaly detection independently of the agent.
+- Add new data sources in the future.
+Error Handling and Reliability
+The application is designed to handle failures at different stages of the workflow.
+Examples include:
+- Invalid CSV files
+- Missing columns
+- Unsupported analytical operations
+- Invalid generated SQL
+- External LLM/API failures
+- Unsupported chart configurations
+The local analytical layer provides a fallback for supported deterministic operations.
+Security
+API keys should be stored in environment variables.
+The .env file must not be committed to GitHub.
+The repository includes .gitignore configuration to prevent environment secrets and virtual-environment files from being uploaded.
+Assignment Deliverables
+The repository contains the requested project deliverables:
+Complete Source Code
+The complete application source code is included in the repository.
+README
+This document provides:
+- Project overview
+- Requirements
+- Features
+- Project flow
+- Architecture
+- Folder structure
+- Setup instructions
+- Usage instructions
+- Current implementation status
+Architecture Diagram
+Available at:
+docs/architecture.svg
+
+Docker Support
+Provided through:
+Dockerfile
+docker-compose.yml
+
+Sample Dataset(s)
+Provided in:
+data/
+
+Future Improvements
+Future development can extend the project with:
+- Advanced multi-dataset reasoning
+- Automatic dataset relationships and joins
+- More advanced forecasting models
+- More intelligent visualization selection
+- Automated report generation
+- Downloadable analysis reports
+- Authentication and user management
+- Response streaming
+- Caching of repeated analytical operations
+- Production-grade logging and observability
+- Automated evaluation benchmarks
+- More sophisticated agentic workflows
+- Additional data formats beyond CSV
+Project Status
+Core implementation completed with advanced capabilities under refinement.
+The current version establishes the main pipeline required for an AI-powered data analyst:
+CSV
+ ↓
+Validation
+ ↓
+Profiling
+ ↓
+Natural Language Question
+ ↓
+Agent / LLM
+ ↓
+Analytical Tool
+ ↓
+Actual Data Analysis
+ ↓
+Result / Chart / Code / Insight
+
+The project is structured to allow the remaining advanced capabilities to be integrated incrementally without redesigning the core application.
+Assignment
+This project was developed as part of an AI/ML engineering assignment for an AI-powered Data Analyst system.
